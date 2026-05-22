@@ -1,0 +1,231 @@
+
+<script>
+// ═══════════════════════════════════════
+// STARTUPLAB.01 MARKETING DASHBOARD v2.0
+// ═══════════════════════════════════════
+
+// RELOJ EN VIVO
+function tick(){
+  const n=new Date();
+  document.getElementById('clk').textContent=n.toLocaleTimeString('es-MX');
+  document.getElementById('lastUp').textContent='Act: '+n.toLocaleTimeString('es-MX');
+}
+setInterval(tick,1000); tick();
+
+// NAVEGACIÓN
+function goTo(id){
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+function changePeriod(v){ console.log('Periodo:',v,'días'); refreshAll(); }
+
+// VARIACIÓN ALEATORIA (simula datos en vivo)
+const rng=(v,p=.02)=>v*(1+(Math.random()-.5)*p);
+const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':Math.round(n).toString();
+const fmtC=n=>n>=1000?'$'+(n/1000).toFixed(1)+'K':'$'+n.toFixed(0);
+
+// ANIMAR NÚMERO
+function pop(el){if(!el)return;el.classList.remove('popped');void el.offsetWidth;el.classList.add('popped')}
+
+// ACTUALIZAR KPIs EN VIVO
+function updateKPIs(){
+  const u=[
+    ['k-reach',fmt(rng(248400))],['k-leads',Math.round(rng(342,.04)).toString()],
+    ['k-cac','$'+rng(47.2,.02).toFixed(1)],['k-roas',rng(4.8,.03).toFixed(1)+'x'],
+    ['k-conv',Math.round(rng(89,.04)).toString()],['k-rev',fmtC(rng(18400,.02))],
+    ['li-f',Math.round(rng(3742,.005)).toString()],['li-i',fmt(rng(44200,.02))],
+    ['li-e',rng(4.24,.03).toFixed(2)+'%'],['li-c',Math.round(rng(1872,.02)).toString()],
+    ['mt-r',fmt(rng(84200,.02))],['mt-s',fmtC(rng(1240,.01))],
+    ['mt-c',rng(2.14,.03).toFixed(2)+'%'],['mt-cpm','$'+rng(10.32,.02).toFixed(2)],
+    ['ga-i',fmt(rng(92400,.01))],['ga-c',Math.round(rng(4820,.02)).toString()],
+    ['ga-ct',rng(5.21,.02).toFixed(2)+'%'],['ga-cp','$'+rng(1.84,.02).toFixed(2)],
+    ['ga-cv',rng(8.9,.03).toFixed(1)+'%'],
+    ['g4-s',fmt(rng(14820,.02))],['g4-u',fmt(rng(9240,.02))],
+    ['g4-b',rng(48.3,.02).toFixed(1)+'%'],
+    ['em-s',Math.round(rng(1340,.005)).toString()],['em-o',rng(34.2,.02).toFixed(1)+'%'],
+    ['em-c',rng(8.4,.02).toFixed(1)+'%'],['em-u',rng(0.4,.05).toFixed(1)+'%'],
+  ];
+  u.forEach(([id,val])=>{const el=document.getElementById(id);if(el){el.textContent=val;pop(el)}});
+  // Actualizar charts
+  updateCharts();
+}
+
+// COLORES CHART.JS
+const CC={
+  blue:'rgba(59,130,246,',purple:'rgba(139,92,246,',green:'rgba(16,185,129,',
+  orange:'rgba(245,158,11,',red:'rgba(239,68,68,',pink:'rgba(236,72,153,'
+};
+const gridC='rgba(42,53,80,0.7)';
+const tickC='#64748b';
+const baseOpts={responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2235',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#2a3550',borderWidth:1}},
+  scales:{x:{grid:{color:gridC},ticks:{color:tickC,font:{size:10}}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:10}}}}};
+
+let charts={};
+
+function initCharts(){
+  // TREND CHART
+  charts.trend=new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
+      datasets:[
+        {label:'Leads',data:[34,38,42,48,52,58,62,70],borderColor:CC.blue+'1)',backgroundColor:CC.blue+'.1)',tension:.4,fill:true,pointRadius:4,pointBackgroundColor:CC.blue+'1)'},
+        {label:'Alcance(K)',data:[24.2,26.8,28.4,30.1,32.8,35.2,38.4,42.1],borderColor:CC.purple+'1)',backgroundColor:CC.purple+'.08)',tension:.4,fill:true,pointRadius:4,pointBackgroundColor:CC.purple+'1)'},
+        {label:'Conv.',data:[8,9,10,11,13,14,16,18],borderColor:CC.green+'1)',backgroundColor:CC.green+'.08)',tension:.4,fill:true,pointRadius:4,pointBackgroundColor:CC.green+'1)'}
+      ]},
+    options:{...baseOpts,plugins:{...baseOpts.plugins,legend:{display:true,labels:{color:'#94a3b8',font:{size:11},boxWidth:12}}}}
+  });
+
+  // ROAS POR CANAL
+  charts.roas=new Chart(document.getElementById('roasChart'),{
+    type:'bar',
+    data:{labels:['Google Ads','Meta','LinkedIn','Email','Organic'],
+      datasets:[
+        {label:'Inversión $',data:[1400,1240,0,180,0],backgroundColor:CC.red+'.7)',borderRadius:5},
+        {label:'Revenue $',data:[6720,3968,4200,1980,3200],backgroundColor:CC.green+'.7)',borderRadius:5}
+      ]},
+    options:{...baseOpts,plugins:{...baseOpts.plugins,legend:{display:true,labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}}}
+  });
+
+  // FUENTES DE TRÁFICO
+  charts.traffic=new Chart(document.getElementById('trafficChart'),{
+    type:'doughnut',
+    data:{labels:['Organic','Paid','Social','Email','Referral','Direct'],
+      datasets:[{data:[32,24,19,12,8,5],
+        backgroundColor:[CC.blue+'1)',CC.green+'1)',CC.purple+'1)',CC.orange+'1)',CC.pink+'1)',CC.red+'.6)'],
+        borderColor:'#1a2235',borderWidth:2,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:12}},
+      tooltip:{backgroundColor:'#1a2235',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#2a3550',borderWidth:1}}}
+  });
+
+  // CTR POR CANAL
+  charts.ctr=new Chart(document.getElementById('ctrChart'),{
+    type:'bar',
+    data:{labels:['Google Ads','LinkedIn','Meta Ads','Email','Organic'],
+      datasets:[{data:[5.21,4.24,2.14,8.4,3.8],
+        backgroundColor:[CC.green+'.8)',CC.blue+'.8)',CC.purple+'.8)',CC.orange+'.8)',CC.pink+'.8)'],
+        borderRadius:6,borderSkipped:false}]},
+    options:{...baseOpts,indexAxis:'y'}
+  });
+
+  // LINKEDIN GROWTH
+  charts.li=new Chart(document.getElementById('liChart'),{
+    type:'line',
+    data:{labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
+      datasets:[{data:[3490,3540,3590,3620,3650,3685,3710,3742],
+        borderColor:CC.blue+'1)',backgroundColor:CC.blue+'.1)',tension:.4,fill:true,pointRadius:3}]},
+    options:{...baseOpts}
+  });
+
+  // META PLATFORM (Instagram vs Facebook)
+  charts.metaPlat=new Chart(document.getElementById('metaPlatChart'),{
+    type:'doughnut',
+    data:{labels:['Instagram','Facebook'],
+      datasets:[{data:[68,32],backgroundColor:[CC.purple+'1)',CC.blue+'1)'],borderColor:'#1a2235',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{color:'#94a3b8',font:{size:10},boxWidth:10}},
+      tooltip:{backgroundColor:'#1a2235',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#2a3550',borderWidth:1}}}
+  });
+
+  // META LEADS POR CAMPAÑA
+  charts.metaLeads=new Chart(document.getElementById('metaLeadsChart'),{
+    type:'bar',
+    data:{labels:['Prospecting','Retargeting','Brand','Lead Mag.'],
+      datasets:[{data:[42,68,18,54],
+        backgroundColor:[CC.blue+'.8)',CC.green+'.8)',CC.purple+'.8)',CC.orange+'.8)'],
+        borderRadius:6}]},
+    options:{...baseOpts}
+  });
+
+  // GOOGLE ADS CONVERSIONES
+  charts.gads=new Chart(document.getElementById('gadsChart'),{
+    type:'pie',
+    data:{labels:['Demo Agendada','Registro Web','Descarga Guía','Contacto'],
+      datasets:[{data:[73,48,92,38],
+        backgroundColor:[CC.blue+'1)',CC.green+'1)',CC.purple+'1)',CC.orange+'1)'],
+        borderColor:'#1a2235',borderWidth:2,hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:12}},
+      tooltip:{backgroundColor:'#1a2235',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#2a3550',borderWidth:1}}}
+  });
+
+  // LEADS POR CANAL
+  charts.leads=new Chart(document.getElementById('leadsChart'),{
+    type:'bar',
+    data:{labels:['Google Ads','LinkedIn Org.','Meta Ads','Email','SEO Org.','Referral'],
+      datasets:[{label:'Leads',data:[124,98,68,54,42,16],
+        backgroundColor:[CC.blue+'.85)',CC.blue+'.6)',CC.purple+'.85)',CC.orange+'.85)',CC.green+'.85)',CC.pink+'.85)'],
+        borderRadius:8}]},
+    options:{...baseOpts,plugins:{...baseOpts.plugins,legend:{display:false}}}
+  });
+}
+
+// ACTUALIZAR CHARTS CON DATOS EN VIVO
+function updateCharts(){
+  if(charts.trend && charts.trend.data){
+    const d=charts.trend.data.datasets;
+    d[0].data=d[0].data.map(v=>Math.max(1,v+Math.round((Math.random()-.5)*3)));
+    d[1].data=d[1].data.map(v=>Math.max(1,+(v+(Math.random()-.5)*1.5).toFixed(1)));
+    d[2].data=d[2].data.map(v=>Math.max(1,v+Math.round((Math.random()-.5)*1)));
+    charts.trend.update('none');
+  }
+}
+
+// REFRESH MANUAL
+function refreshAll(){
+  const btn=document.querySelector('.btn-g');
+  if(btn){btn.textContent='⏳ Actualizando...';btn.disabled=true}
+  setTimeout(()=>{
+    updateKPIs();
+    if(btn){btn.textContent='🔄 Refresh';btn.disabled=false}
+  },800);
+}
+
+// INICIAR TODO
+window.addEventListener('load',()=>{
+  setTimeout(initCharts, 100);
+  updateKPIs();
+  // Actualización automática cada 30 segundos
+  setInterval(updateKPIs, 30000);
+});
+
+/* ═══════════════════════════════════════
+   GUÍA DE CONEXIÓN A APIs REALES
+   ═══════════════════════════════════════
+
+   1. LINKEDIN MARKETING API
+      - Crear app en: https://www.linkedin.com/developers/
+      - Permisos: r_organization_social, r_ads_reporting
+      - Endpoint: GET https://api.linkedin.com/v2/organizationalEntityShareStatistics
+      - Auth: OAuth 2.0 Bearer Token
+
+   2. META GRAPH API (Facebook/Instagram)
+      - Crear app en: https://developers.facebook.com/
+      - Permisos: ads_read, read_insights, instagram_basic
+      - Endpoint: GET https://graph.facebook.com/v19.0/{ad-account-id}/insights
+      - Auth: Access Token de larga duración
+
+   3. GOOGLE ANALYTICS 4 DATA API
+      - Activar en: https://console.cloud.google.com/
+      - Service Account + JSON key
+      - Endpoint: POST https://analyticsdata.googleapis.com/v1beta/properties/{id}:runReport
+      - Auth: Service Account OAuth2
+
+   4. GOOGLE ADS API
+      - Registrar en: https://ads.google.com/nav/selectaccount
+      - Developer Token necesario
+      - Usar Google Ads Query Language (GAQL)
+      - Auth: OAuth2 + Developer Token
+
+   Para arquitectura backend recomendada:
+   - Node.js/Python server que consulta estas APIs
+   - Caché Redis con TTL de 5-15 minutos
+   - WebSockets para push de datos al cliente
+   - Dashboard se suscribe via EventSource o WebSocket
+
+*/
+</script>
+</body>
+</html>
