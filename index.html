@@ -229,3 +229,336 @@ window.addEventListener('load',()=>{
 </script>
 </body>
 </html>
+
+<!-- ═══ SOCIOS FUNDADORES: TRACKING DE MENCIONES ═══ -->
+<style>
+.socio-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:.2s}
+.socio-card:hover{border-color:rgba(59,130,246,.4)}
+.socio-logo{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.socio-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.socio-name{font-size:15px;font-weight:800}
+.socio-desc{font-size:11px;color:var(--dim);margin-top:1px}
+.mention-num{font-size:28px;font-weight:800;line-height:1}
+.mention-plat{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.mention-plat:last-child{border-bottom:none}
+.plat-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.plat-name{font-size:12px;color:var(--muted);flex:1}
+.plat-count{font-size:13px;font-weight:700}
+.sentiment-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:5px}
+.sent-pos{height:100%;background:linear-gradient(90deg,var(--green),#34d399);border-radius:3px;transition:width 1.2s ease}
+.sent-label{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:3px}
+.alert-mention{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px}
+.alert-title{font-size:12px;font-weight:700;color:var(--orange);margin-bottom:3px}
+.alert-body{color:var(--muted);line-height:1.5}
+.mention-trend-wrap{position:relative;height:90px;margin-top:10px}
+.keyword-cloud{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.keyword{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:var(--blue);padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;cursor:default;transition:.2s}
+.keyword:hover{background:rgba(59,130,246,.22)}
+.keyword.hot{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:var(--red)}
+.keyword.warm{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--orange)}
+.soc-total-card{background:linear-gradient(135deg,rgba(59,130,246,.09),rgba(139,92,246,.09));border:1px solid rgba(59,130,246,.25);border-radius:12px;padding:18px}
+.plataforma-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.plataforma-row:last-child{border-bottom:none}
+</style>
+
+<!-- Añadir al nav -->
+<script>
+(function(){
+  const nav = document.querySelector('.nav');
+  if(nav){
+    const sec = document.createElement('div');
+    sec.className='nav-sec'; sec.textContent='Socios Fundadores';
+    const item = document.createElement('div');
+    item.className='nav-item';
+    item.innerHTML='<span>🤝</span>Menciones Socios';
+    item.onclick=function(){document.getElementById('socios')?.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));item.classList.add('active')};
+    nav.appendChild(sec); nav.appendChild(item);
+  }
+})();
+</script>
+
+<!-- Insertar sección antes del cierre del main -->
+<script>
+(function(){
+  const cnt = document.querySelector('.cnt');
+  if(!cnt) return;
+  const sec = document.createElement('div');
+  sec.id='socios'; sec.className='sec';
+  sec.innerHTML = `
+  <div class="sec-h">
+    <div class="sec-t">🤝 Socios Fundadores · Tracking de Menciones en Vivo</div>
+    <span style="font-size:11px;color:var(--dim)">LinkedIn · Twitter/X · Noticias · Web</span>
+  </div>
+
+  <!-- TOTALES GENERALES -->
+  <div class="g g4" style="margin-bottom:16px">
+    <div class="soc-total-card">
+      <div style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Total Menciones · Mes</div>
+      <div style="font-size:32px;font-weight:800;color:var(--blue)" id="tot-all">847</div>
+      <div style="font-size:12px;color:var(--green);font-weight:600;margin-top:4px">↑ 34% vs mes anterior</div>
+    </div>
+    <div class="soc-total-card">
+      <div style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Alcance de Menciones</div>
+      <div style="font-size:32px;font-weight:800;color:var(--purple)" id="tot-reach">2.4M</div>
+      <div style="font-size:12px;color:var(--green);font-weight:600;margin-top:4px">↑ 18% personas alcanzadas</div>
+    </div>
+    <div class="soc-total-card">
+      <div style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Sentimiento Positivo</div>
+      <div style="font-size:32px;font-weight:800;color:var(--green)" id="tot-sent">78%</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:4px">Neutro 17% · Negativo 5%</div>
+    </div>
+    <div class="soc-total-card">
+      <div style="font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Alertas Activas</div>
+      <div style="font-size:32px;font-weight:800;color:var(--orange)" id="tot-alerts">3</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:4px">2 positivas · 1 para atender</div>
+    </div>
+  </div>
+
+  <!-- TENDENCIA DE MENCIONES -->
+  <div class="g g2" style="margin-bottom:16px">
+    <div class="card span2">
+      <div class="ch">
+        <span class="ct">Menciones por socio · Últimas 8 semanas</span>
+        <div style="display:flex;gap:14px;font-size:11px">
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0033a0;margin-right:4px"></span>BancoEstado</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00b1a9;margin-right:4px"></span>BID Lab</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c8a84b;margin-right:4px"></span>Codelco</span>
+        </div>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="sociosTrendChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TARJETAS POR SOCIO -->
+  <div class="g g3">
+
+    <!-- BANCOESTADO -->
+    <div class="socio-card" style="border-top:3px solid #0033a0">
+      <div class="socio-header">
+        <div class="socio-logo" style="background:rgba(0,51,160,.15)">🏦</div>
+        <div>
+          <div class="socio-name" style="color:#4d8af0">BancoEstado</div>
+          <div class="socio-desc">Socio Fundador · Financiero</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div class="mention-num" id="be-total" style="color:#4d8af0">312</div>
+          <div style="font-size:10px;color:var(--dim)">menciones</div>
+        </div>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(0,119,181,.2)">💼</div>
+        <span class="plat-name">LinkedIn</span>
+        <span class="plat-count" id="be-li">148</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(29,161,242,.2)">🐦</div>
+        <span class="plat-name">Twitter / X</span>
+        <span class="plat-count" id="be-tw">94</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(24,119,242,.2)">📱</div>
+        <span class="plat-name">Facebook / IG</span>
+        <span class="plat-count" id="be-fb">42</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(245,158,11,.2)">📰</div>
+        <span class="plat-name">Noticias / Web</span>
+        <span class="plat-count" id="be-nw">28</span>
+      </div>
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted)">Sentimiento</span>
+          <span style="font-size:11px;font-weight:700;color:var(--green)" id="be-sent">82% positivo</span>
+        </div>
+        <div class="sentiment-bar"><div class="sent-pos" id="be-sent-bar" style="width:82%"></div></div>
+        <div class="sent-label"><span>Positivo</span><span>Neutro 13% · Neg. 5%</span></div>
+      </div>
+      <div class="keyword-cloud" id="be-keywords">
+        <span class="keyword">innovación</span>
+        <span class="keyword hot">StartupLab</span>
+        <span class="keyword">financiamiento</span>
+        <span class="keyword warm">aceleración</span>
+        <span class="keyword">PyMEs</span>
+        <span class="keyword">tecnología</span>
+      </div>
+      <div class="alert-mention">
+        <div class="alert-title">🚀 Mención destacada</div>
+        <div class="alert-body">El CEO de BancoEstado mencionó StartupLab.01 en LinkedIn con 8.4K impresiones. Considera responder y amplificar.</div>
+      </div>
+    </div>
+
+    <!-- BID LAB -->
+    <div class="socio-card" style="border-top:3px solid #00b1a9">
+      <div class="socio-header">
+        <div class="socio-logo" style="background:rgba(0,177,169,.15)">🌎</div>
+        <div>
+          <div class="socio-name" style="color:#00b1a9">BID Lab</div>
+          <div class="socio-desc">Socio Fundador · Multilateral</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div class="mention-num" id="bl-total" style="color:#00b1a9">284</div>
+          <div style="font-size:10px;color:var(--dim)">menciones</div>
+        </div>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(0,119,181,.2)">💼</div>
+        <span class="plat-name">LinkedIn</span>
+        <span class="plat-count" id="bl-li">162</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(29,161,242,.2)">🐦</div>
+        <span class="plat-name">Twitter / X</span>
+        <span class="plat-count" id="bl-tw">78</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(24,119,242,.2)">📱</div>
+        <span class="plat-name">Facebook / IG</span>
+        <span class="plat-count" id="bl-fb">24</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(245,158,11,.2)">📰</div>
+        <span class="plat-name">Noticias / Web</span>
+        <span class="plat-count" id="bl-nw">20</span>
+      </div>
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted)">Sentimiento</span>
+          <span style="font-size:11px;font-weight:700;color:var(--green)" id="bl-sent">91% positivo</span>
+        </div>
+        <div class="sentiment-bar"><div class="sent-pos" id="bl-sent-bar" style="width:91%"></div></div>
+        <div class="sent-label"><span>Positivo</span><span>Neutro 7% · Neg. 2%</span></div>
+      </div>
+      <div class="keyword-cloud" id="bl-keywords">
+        <span class="keyword hot">impacto</span>
+        <span class="keyword">innovación social</span>
+        <span class="keyword warm">LATAM</span>
+        <span class="keyword">ecosistema</span>
+        <span class="keyword">emprendimiento</span>
+        <span class="keyword">inversión</span>
+      </div>
+      <div class="alert-mention">
+        <div class="alert-title">📢 Campaña activa</div>
+        <div class="alert-body">BID Lab está impulsando contenido sobre startups de impacto en LATAM. Alta oportunidad de co-publicación esta semana.</div>
+      </div>
+    </div>
+
+    <!-- CODELCO -->
+    <div class="socio-card" style="border-top:3px solid #c8a84b">
+      <div class="socio-header">
+        <div class="socio-logo" style="background:rgba(200,168,75,.15)">⛏️</div>
+        <div>
+          <div class="socio-name" style="color:#c8a84b">Codelco</div>
+          <div class="socio-desc">Socio Fundador · Minería</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div class="mention-num" id="co-total" style="color:#c8a84b">251</div>
+          <div style="font-size:10px;color:var(--dim)">menciones</div>
+        </div>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(0,119,181,.2)">💼</div>
+        <span class="plat-name">LinkedIn</span>
+        <span class="plat-count" id="co-li">120</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(29,161,242,.2)">🐦</div>
+        <span class="plat-name">Twitter / X</span>
+        <span class="plat-count" id="co-tw">72</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(24,119,242,.2)">📱</div>
+        <span class="plat-name">Facebook / IG</span>
+        <span class="plat-count" id="co-fb">38</span>
+      </div>
+      <div class="mention-plat">
+        <div class="plat-icon" style="background:rgba(245,158,11,.2)">📰</div>
+        <span class="plat-name">Noticias / Web</span>
+        <span class="plat-count" id="co-nw">21</span>
+      </div>
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted)">Sentimiento</span>
+          <span style="font-size:11px;font-weight:700;color:var(--orange)" id="co-sent">68% positivo</span>
+        </div>
+        <div class="sentiment-bar"><div class="sent-pos" id="co-sent-bar" style="width:68%"></div></div>
+        <div class="sent-label"><span>Positivo</span><span>Neutro 22% · Neg. 10%</span></div>
+      </div>
+      <div class="keyword-cloud" id="co-keywords">
+        <span class="keyword warm">minería verde</span>
+        <span class="keyword hot">innovación</span>
+        <span class="keyword">sostenibilidad</span>
+        <span class="keyword">tecnología minera</span>
+        <span class="keyword">StartupLab</span>
+      </div>
+      <div class="alert-mention" style="background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.3)">
+        <div class="alert-title" style="color:var(--red)">⚠️ Mención negativa detectada</div>
+        <div class="alert-body">2 publicaciones en Twitter critican relación Codelco-startups. Monitorear y preparar respuesta si escala. Sentimiento bajó 4pp esta semana.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE ÚLTIMAS MENCIONES -->
+  <div class="card" style="margin-top:16px">
+    <div class="ch"><span class="ct">📋 Últimas menciones detectadas · Tiempo real</span><span style="font-size:11px;color:var(--green);font-weight:600"><span class="live-dot"></span>Live</span></div>
+    <table class="dt">
+      <tr><th>Socio</th><th>Plataforma</th><th>Contenido</th><th>Alcance</th><th>Sentimiento</th><th>Hace</th></tr>
+      <tr><td><span style="color:#4d8af0;font-weight:700">BancoEstado</span></td><td>💼 LinkedIn</td><td>"StartupLab.01 y BancoEstado juntos impulsando el ecosistema emprendedor de Chile"</td><td>8,420</td><td><span class="tag tu">Positivo</span></td><td>12 min</td></tr>
+      <tr><td><span style="color:#00b1a9;font-weight:700">BID Lab</span></td><td>🐦 Twitter</td><td>"Proud to support @StartupLab01 in building the next generation of #LATAM founders"</td><td>3,280</td><td><span class="tag tu">Positivo</span></td><td>1 hora</td></tr>
+      <tr><td><span style="color:#c8a84b;font-weight:700">Codelco</span></td><td>📰 Noticias</td><td>"Codelco apuesta por startups tecnológicas a través de StartupLab para modernizar operaciones"</td><td>12,400</td><td><span class="tag tu">Positivo</span></td><td>3 horas</td></tr>
+      <tr><td><span style="color:#4d8af0;font-weight:700">BancoEstado</span></td><td>📱 Instagram</td><td>Repost de video del Demo Day StartupLab.01 con logo BancoEstado visible</td><td>4,820</td><td><span class="tag tu">Positivo</span></td><td>5 horas</td></tr>
+      <tr><td><span style="color:#c8a84b;font-weight:700">Codelco</span></td><td>🐦 Twitter</td><td>"¿Por qué Codelco apoya startups si tiene problemas internos? Cuestionamos esta alianza"</td><td>1,840</td><td><span class="tag td">Negativo</span></td><td>8 horas</td></tr>
+      <tr><td><span style="color:#00b1a9;font-weight:700">BID Lab</span></td><td>💼 LinkedIn</td><td>"Inversión en innovación es inversión en el futuro de LATAM — con BID Lab y StartupLab"</td><td>6,100</td><td><span class="tag tu">Positivo</span></td><td>1 día</td></tr>
+    </table>
+  </div>
+  `;
+  cnt.appendChild(sec);
+
+  // CHART DE TENDENCIA DE SOCIOS
+  setTimeout(function(){
+    const ctx = document.getElementById('sociosTrendChart');
+    if(!ctx) return;
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['S1','S2','S3','S4','S5','S6','S7','S8'],
+        datasets: [
+          {label:'BancoEstado', data:[28,32,38,41,52,58,62,72], borderColor:'#4d8af0', backgroundColor:'rgba(77,138,240,.1)', tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#4d8af0'},
+          {label:'BID Lab',     data:[22,28,30,36,44,50,56,64], borderColor:'#00b1a9', backgroundColor:'rgba(0,177,169,.08)', tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#00b1a9'},
+          {label:'Codelco',     data:[18,24,28,32,38,42,48,54], borderColor:'#c8a84b', backgroundColor:'rgba(200,168,75,.08)', tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#c8a84b'}
+        ]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:true,labels:{color:'#94a3b8',font:{size:11},boxWidth:12}},tooltip:{backgroundColor:'#1a2235',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#2a3550',borderWidth:1}},
+        scales:{x:{grid:{color:'rgba(42,53,80,.7)'},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(42,53,80,.7)'},ticks:{color:'#64748b',font:{size:10}}}}
+      }
+    });
+  }, 400);
+
+  // ACTUALIZACIÓN EN VIVO DE MENCIONES
+  function updateSocios(){
+    const v=(n,p=.04)=>Math.round(n*(1+(Math.random()-.5)*p));
+    const be=v(312), bl=v(284), co=v(251);
+    const setV=(id,val)=>{const el=document.getElementById(id);if(el){el.textContent=val;el.classList.remove('popped');void el.offsetWidth;el.classList.add('popped')}};
+    setV('be-total',be); setV('bl-total',bl); setV('co-total',co);
+    setV('tot-all',(be+bl+co).toString());
+    setV('be-li',v(148)); setV('be-tw',v(94)); setV('be-fb',v(42)); setV('be-nw',v(28));
+    setV('bl-li',v(162)); setV('bl-tw',v(78)); setV('bl-fb',v(24)); setV('bl-nw',v(20));
+    setV('co-li',v(120)); setV('co-tw',v(72)); setV('co-fb',v(38)); setV('co-nw',v(21));
+    const beSent=Math.round(82+(Math.random()-.5)*4);
+    const blSent=Math.round(91+(Math.random()-.5)*3);
+    const coSent=Math.round(68+(Math.random()-.5)*5);
+    setV('be-sent',beSent+'% positivo');
+    setV('bl-sent',blSent+'% positivo');
+    setV('co-sent',coSent+'% positivo');
+    ['be-sent-bar','bl-sent-bar','co-sent-bar'].forEach((id,i)=>{
+      const vals=[beSent,blSent,coSent];
+      const el=document.getElementById(id);
+      if(el) el.style.width=vals[i]+'%';
+    });
+  }
+  setInterval(updateSocios, 30000);
+})();
+</script>
+</body>
+</html>
