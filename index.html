@@ -6,7 +6,7 @@
 <title>StartupLab.01 – Marketing Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box
 body{font-family:'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;display:flex;min-height:100vh}
 .sidebar{width:220px;background:#1a1d2e;padding:24px 16px;display:flex;flex-direction:column;gap:8px;position:fixed;height:100vh;overflow-y:auto;z-index:100}
 .logo{font-size:18px;font-weight:700;color:#fff;padding:8px 12px;margin-bottom:16px;border-bottom:1px solid #2d3155}
@@ -188,10 +188,10 @@ body{font-family:'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;display:
 function tick(){const n=new Date();const el=document.getElementById('clk');if(el)el.textContent=n.toLocaleTimeString('es-CL');const lu=document.getElementById('lastUp');if(lu)lu.textContent='Actualizado: '+n.toLocaleTimeString('es-CL');}
 setInterval(tick,1000);tick();
 function goTo(id,el){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));if(el)el.classList.add('active');}
-function changePeriod(v,btn){document.querySelectorAll('.period-btns button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+function changePeriod(v,btn){document.querySelectorAll('.period-btnsbutton').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':Math.round(n).toString();
 async function refreshAll(){
-try{const r=await fetch('/api/ga4');if(r.ok){const d=await r.json();document.getElementById('kpi-sessions').textContent=fmt(d.sessions||7300);document.getElementById('ga4-sessions').textContent=fmt(d.sessions||7300);document.getElementById('ga4-users').textContent=fmt(d.users||4100);}}catch(e){document.getElementById('kpi-sessions').textContent='7.3K';}
+try{const r=await fetc('/api/ga4?range='+(window._ga4Range||30));if(r.ok){const d=await r.json();document.getElementById('kpi-sessions').textContent=fmt(d.sessions||7300);document.getElementById('ga4-sessions').textContent=fmt(d.sessions||7300);document.getElementById('ga4-users').textContent=fmt(d.users||4100);}}catch(e){document.getElementById('kpi-sessions').textContent='7.3K';}
 try{const r=await fetch('/api/linkedin');if(r.ok){const d=await r.json();document.getElementById('kpi-li-followers').textContent=fmt(d.followers||960);document.getElementById('li-followers').textContent=fmt(d.followers||960);}}catch(e){document.getElementById('kpi-li-followers').textContent='960';}
 try{const r=await fetch('/api/socios');if(r.ok){const d=await r.json();document.getElementById('be-mentions').textContent=d.bancoestado?.mentions||24;document.getElementById('bidlab-mentions').textContent=d.bidlab?.mentions||18;document.getElementById('codelco-mentions').textContent=d.codelco?.mentions||31;document.getElementById('kpi-mentions').textContent=(d.bancoestado?.mentions||24)+(d.bidlab?.mentions||18)+(d.codelco?.mentions||31);}}catch(e){}
 }
